@@ -11,7 +11,7 @@ header{background:#fff;border-bottom:1px solid #ddd;padding:20px}.wrap{max-width
 .search button{border:0;border-radius:3px;background:#ef7d19;color:white;font-weight:700;padding:0 24px;font-size:16px;cursor:pointer}
 main{padding:28px 20px}.content{max-width:1000px;margin:auto}.title{font-size:25px;font-weight:500;margin:0 0 8px}.count{color:#777;margin-bottom:20px}
 .job{background:#fff;border:1px solid #ddd;border-radius:3px;padding:20px;margin-bottom:12px}.job h2{font-size:19px;margin:0 0 8px;color:#e67817}.job .company{font-weight:700;margin-bottom:6px}.meta{color:#777;font-size:14px;margin-bottom:12px}.desc{font-size:14px;line-height:1.5;color:#555}.apply{display:inline-block;margin-top:13px;color:#e67817;font-weight:700;text-decoration:none}
-.notice{background:#fff;border:1px solid #ddd;padding:25px;text-align:center;color:#777}
+.notice{background:#fff;border:1px solid #ddd;padding:25px;text-align:center;color:#777}.pager{display:flex;gap:8px;justify-content:center;margin-top:22px}.pager a{padding:9px 14px;background:#fff;border:1px solid #ddd;text-decoration:none;color:#555;border-radius:3px}
 footer{text-align:center;padding:25px;color:#888;font-size:13px}
 @media(max-width:650px){.search{display:block}.search input,.search button{width:100%;height:48px;margin-bottom:8px}}
 </style>
@@ -21,17 +21,95 @@ footer{text-align:center;padding:25px;color:#888;font-size:13px}
 <form class="search" id="search"><input id="q" placeholder="Job Title, Keywords..."><input id="loc" placeholder="Enter location/area/postcode..."><button>Search Jobs</button></form></div></header>
 <main><div class="content">
 <h1 class="title" id="heading">Job Search Results</h1>
-<div class="count">JobsOther search</div>
-<div id="results"></div>
+<div class="count" id="count">Loading jobs...</div>
+<div id="results"><div class="notice">Loading jobs...</div></div>
+<div class="pager" id="pager"></div>
 </div></main>
 <footer>Copyright © 2026 JobsOther. All Rights Reserved.</footer>
 <script>
 const params=new URLSearchParams(location.search);
-const q=params.get('q')||''; const loc=params.get('location')||'';
-document.getElementById('q').value=q;document.getElementById('loc').value=loc;
-document.getElementById('heading').textContent=(q? q+' jobs':'Jobs')+(loc?' in '+loc:'');
-document.getElementById('search').addEventListener('submit',e=>{e.preventDefault();const p=new URLSearchParams();if(qv.value.trim())p.set('q',qv.value.trim());if(lv.value.trim())p.set('location',lv.value.trim());location.href='/jobs.html?'+p});
-const qv=document.getElementById('q'),lv=document.getElementById('loc');
-document.getElementById('results').innerHTML='<div class="notice"><strong>Live job results are the next step.</strong><br><br>The search page is ready. We will connect the job-data API here so searches return real vacancies.</div>';
+const q=params.get('q')||'';
+const loc=params.get('location')||'';
+const page=Math.max(1,parseInt(params.get('page')||'1',10));
+const qv=document.getElementById('q');
+const lv=document.getElementById('loc');
+qv.value=q;lv.value=loc;
+document.getElementById('heading').textContent=(q?q+' jobs':'Jobs')+(loc?' in '+loc:'');
+
+document.getElementById('search').addEventListener('submit',e=>{
+  e.preventDefault();
+  const p=new URLSearchParams();
+  if(qv.value.trim())p.set('q',qv.value.trim());
+  if(lv.value.trim())p.set('location',lv.value.trim());
+  location.href='/jobs.html?'+p;
+});
+
+function esc(value){
+  return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function stripHtml(value){
+  const d=document.createElement('div');
+  d.innerHTML=String(value||'');
+  return d.textContent||d.innerText||'';
+}
+function salary(job){
+  if(job.salary_min==null && job.salary_max==null) return '';
+  const fmt=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0}).format(n);
+  if(job.salary_min!=null && job.salary_max!=null) return fmt(job.salary_min)+' – '+fmt(job.salary_max);
+  return fmt(job.salary_min ?? job.salary_max);
+}
+function pageUrl(n){
+  const p=new URLSearchParams();
+  if(q)p.set('q',q);
+  if(loc)p.set('location',loc);
+  p.set('page',String(n));
+  return '/jobs.html?'+p.toString();
+}
+
+async function load(){
+  const api=new URLSearchParams({page:String(page),results_per_page:'20'});
+  if(q)api.set('q',q);
+  if(loc)api.set('location',loc);
+
+  try{
+    const r=await fetch('/api/jobs?'+api.toString());
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Unable to load jobs');
+
+    document.getElementById('count').textContent=
+      new Intl.NumberFormat('en-CA').format(data.count||0)+' jobs found';
+
+    if(!data.results?.length){
+      document.getElementById('results').innerHTML='<div class="notice">No jobs found. Try a different keyword or location.</div>';
+      return;
+    }
+
+    document.getElementById('results').innerHTML=data.results.map(job=>{
+      const desc=stripHtml(job.description).slice(0,260);
+      const pay=salary(job);
+      const type=[job.contract_time,job.contract_type].filter(Boolean).join(' · ');
+      return '<article class="job">'+
+        '<h2>'+esc(job.title)+'</h2>'+
+        (job.company?'<div class="company">'+esc(job.company)+'</div>':'')+
+        '<div class="meta">'+
+          (job.location?'📍 '+esc(job.location):'')+
+          (pay?' &nbsp; • &nbsp; 💵 '+esc(pay):'')+
+          (type?' &nbsp; • &nbsp; '+esc(type):'')+
+        '</div>'+
+        '<div class="desc">'+esc(desc)+(desc.length>=260?'…':'')+'</div>'+
+        (job.redirect_url?'<a class="apply" href="'+esc(job.redirect_url)+'" target="_blank" rel="noopener sponsored">View Job →</a>':'')+
+      '</article>';
+    }).join('');
+
+    const pager=[];
+    if(page>1)pager.push('<a href="'+pageUrl(page-1)+'">← Previous</a>');
+    if((data.results||[]).length===20)pager.push('<a href="'+pageUrl(page+1)+'">Next →</a>');
+    document.getElementById('pager').innerHTML=pager.join('');
+  }catch(err){
+    document.getElementById('count').textContent='';
+    document.getElementById('results').innerHTML='<div class="notice"><strong>Jobs could not be loaded.</strong><br><br>'+esc(err.message)+'</div>';
+  }
+}
+load();
 </script>
 </body></html>
