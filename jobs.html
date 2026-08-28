@@ -1,31 +1,107 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Job Search | JobsOther</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#333;background:#f7f7f7}
-header{background:#fff;border-bottom:1px solid #ddd;padding:20px}.wrap{max-width:1000px;margin:auto}
-.brand{font-size:27px;font-weight:700;text-decoration:none;color:#2b2b2b}.brand strong{color:#e67817}
-.search{display:flex;gap:8px;margin:22px 0}.search input{flex:1;height:48px;padding:0 13px;border:1px solid #ccc;border-radius:3px;font-size:15px}
-.search button{border:0;border-radius:3px;background:#ef7d19;color:white;font-weight:700;padding:0 24px;font-size:16px;cursor:pointer}
-main{padding:28px 20px}.content{max-width:1000px;margin:auto}.title{font-size:25px;font-weight:500;margin:0 0 8px}.count{color:#777;margin-bottom:20px}
-.job{background:#fff;border:1px solid #ddd;border-radius:3px;padding:20px;margin-bottom:12px}.job h2{font-size:19px;margin:0 0 8px;color:#e67817}.job .company{font-weight:700;margin-bottom:6px}.meta{color:#777;font-size:14px;margin-bottom:12px}.desc{font-size:14px;line-height:1.5;color:#555}.apply{display:inline-block;margin-top:13px;color:#e67817;font-weight:700;text-decoration:none}
-.notice{background:#fff;border:1px solid #ddd;padding:25px;text-align:center;color:#777}.pager{display:flex;gap:8px;justify-content:center;margin-top:22px}.pager a{padding:9px 14px;background:#fff;border:1px solid #ddd;text-decoration:none;color:#555;border-radius:3px}
-footer{text-align:center;padding:25px;color:#888;font-size:13px}
-@media(max-width:650px){.search{display:block}.search input,.search button{width:100%;height:48px;margin-bottom:8px}}
+:root{
+  --orange:#f47a1f;--orange-dark:#dc6710;--ink:#202733;--muted:#667085;
+  --line:#e5e7eb;--soft:#f6f7f9;--white:#fff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--soft)}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.topbar{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:26px;font-weight:800;letter-spacing:-.8px;color:#23272f}.brand strong{color:var(--orange)}
+.back-home{font-size:13px;color:#687385}.back-home:hover{color:var(--orange)}
+
+.search-strip{background:#fff;border-bottom:1px solid var(--line);padding:16px 0}
+.search{display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px}
+.search input{height:50px;padding:0 14px;border:1px solid #d8dce3;border-radius:9px;font-size:15px;outline:0}
+.search input:focus{border-color:#f0a36c;box-shadow:0 0 0 3px rgba(244,122,31,.08)}
+.search button{border:0;border-radius:9px;background:var(--orange);color:white;font-weight:800;padding:0 24px;font-size:15px;cursor:pointer}
+.search button:hover{background:var(--orange-dark)}
+
+main{padding:30px 0 50px}
+.headline{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:20px}
+.title{font-size:28px;font-weight:800;letter-spacing:-.6px;margin:0 0 5px}
+.count{color:var(--muted);font-size:14px}
+.source-note{font-size:12px;color:#98a2b3}
+
+.job{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:14px;
+  transition:.18s ease;
+}
+.job:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(16,24,40,.07);border-color:#d8dce3}
+.job-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.job h2{font-size:20px;line-height:1.3;margin:0 0 7px;color:#273142}
+.company{font-weight:700;font-size:14px;color:#475467;margin-bottom:12px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 12px;color:#667085;font-size:13px;margin-bottom:13px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#f5f6f8}
+.desc{font-size:14px;line-height:1.58;color:#596273;max-width:900px}
+.apply{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:16px;padding:9px 13px;border-radius:8px;
+  color:#fff;background:var(--orange);font-weight:800;font-size:13px
+}
+.apply:hover{background:var(--orange-dark)}
+.notice{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px;text-align:center;color:#777}
+.pager{display:flex;gap:8px;justify-content:center;margin-top:24px}
+.pager a{padding:9px 14px;background:#fff;border:1px solid var(--line);text-decoration:none;color:#555;border-radius:8px}
+.pager a:hover{border-color:#f0a36c;color:var(--orange)}
+footer{background:#fff;border-top:1px solid var(--line);padding:24px 0;color:#8a93a3;font-size:13px;text-align:center}
+
+@media(max-width:720px){
+  .search{grid-template-columns:1fr}
+  .search button{height:50px}
+  .headline{display:block}
+  .source-note{margin-top:8px}
+  .job{padding:18px}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a class="brand" href="/">Jobs<strong>Other</strong></a>
-<form class="search" id="search"><input id="q" placeholder="Job Title, Keywords..."><input id="loc" placeholder="Enter location/area/postcode..."><button>Search Jobs</button></form></div></header>
-<main><div class="content">
-<h1 class="title" id="heading">Job Search Results</h1>
-<div class="count" id="count">Loading jobs...</div>
-<div id="results"><div class="notice">Loading jobs...</div></div>
-<div class="pager" id="pager"></div>
-</div></main>
-<footer>Copyright © 2026 JobsOther. All Rights Reserved.</footer>
+<header>
+  <div class="wrap topbar">
+    <a class="brand" href="/">Jobs<strong>Other</strong></a>
+    <a class="back-home" href="/">← Back to home</a>
+  </div>
+</header>
+
+<div class="search-strip">
+  <div class="wrap">
+    <form class="search" id="search">
+      <input id="q" placeholder="Job title or keywords">
+      <input id="loc" placeholder="City, province or postcode">
+      <button>Search Jobs</button>
+    </form>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="headline">
+      <div>
+        <h1 class="title" id="heading">Job Search Results</h1>
+        <div class="count" id="count">Loading jobs...</div>
+      </div>
+      <div class="source-note">Listings may redirect to the original job source.</div>
+    </div>
+
+    <div id="results"><div class="notice">Loading jobs...</div></div>
+    <div class="pager" id="pager"></div>
+  </div>
+</main>
+
+<footer>© 2026 JobsOther. All rights reserved.</footer>
+
 <script>
 const params=new URLSearchParams(location.search);
 const q=params.get('q')||'';
@@ -85,19 +161,23 @@ async function load(){
     }
 
     document.getElementById('results').innerHTML=data.results.map(job=>{
-      const desc=stripHtml(job.description).slice(0,260);
+      const desc=stripHtml(job.description).slice(0,320);
       const pay=salary(job);
       const type=[job.contract_time,job.contract_type].filter(Boolean).join(' · ');
+      const meta=[];
+      if(job.location) meta.push('<span class="badge">📍 '+esc(job.location)+'</span>');
+      if(pay) meta.push('<span class="badge">💵 '+esc(pay)+'</span>');
+      if(type) meta.push('<span class="badge">🕒 '+esc(type)+'</span>');
+      if(job.category) meta.push('<span class="badge">▦ '+esc(job.category)+'</span>');
+
       return '<article class="job">'+
-        '<h2>'+esc(job.title)+'</h2>'+
-        (job.company?'<div class="company">'+esc(job.company)+'</div>':'')+
-        '<div class="meta">'+
-          (job.location?'📍 '+esc(job.location):'')+
-          (pay?' &nbsp; • &nbsp; 💵 '+esc(pay):'')+
-          (type?' &nbsp; • &nbsp; '+esc(type):'')+
-        '</div>'+
-        '<div class="desc">'+esc(desc)+(desc.length>=260?'…':'')+'</div>'+
-        (job.redirect_url?'<a class="apply" href="'+esc(job.redirect_url)+'" target="_blank" rel="noopener sponsored">View Job →</a>':'')+
+        '<div class="job-top"><div>'+
+          '<h2>'+esc(job.title)+'</h2>'+
+          (job.company?'<div class="company">'+esc(job.company)+'</div>':'')+
+        '</div></div>'+
+        '<div class="meta">'+meta.join('')+'</div>'+
+        '<div class="desc">'+esc(desc)+(desc.length>=320?'…':'')+'</div>'+
+        (job.redirect_url?'<a class="apply" href="'+esc(job.redirect_url)+'" target="_blank" rel="noopener sponsored">View Job ↗</a>':'')+
       '</article>';
     }).join('');
 
@@ -112,4 +192,5 @@ async function load(){
 }
 load();
 </script>
-</body></html>
+</body>
+</html>
