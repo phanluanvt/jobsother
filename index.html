@@ -117,6 +117,7 @@
       box-shadow:0 0 0 3px rgba(244,122,31,.08);
     }
     .icon{font-size:18px;opacity:.7}
+    .suggest-wrap{position:relative;flex:1}.suggestions{display:none;position:absolute;left:-14px;right:-14px;top:43px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.12);z-index:30;text-align:left;overflow:hidden}.suggestions.show{display:block}.suggestions button{display:block;width:100%;text-align:left;background:#fff!important;color:#333!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:11px 14px!important;min-width:0!important}.suggestions button:hover{background:#fff7f1!important}
     .field input{
       width:100%;
       border:0;
@@ -249,11 +250,11 @@
         <form class="search-form" id="jobSearch">
           <label class="field">
             <span class="icon">⌕</span>
-            <input id="keyword" name="q" type="text" placeholder="Job title or keywords" autocomplete="off">
+            <div class="suggest-wrap"><input id="keyword" name="q" type="text" placeholder="Job title or keywords" autocomplete="off"><div class="suggestions" id="jobSuggestions"></div></div>
           </label>
           <label class="field">
             <span class="icon">⌖</span>
-            <input id="location" name="location" type="text" placeholder="City, province or postcode" autocomplete="off">
+            <div class="suggest-wrap"><input id="location" name="location" type="text" placeholder="City, province or postcode" autocomplete="off"><div class="suggestions" id="locationSuggestions"></div></div>
           </label>
           <button type="submit">Search Jobs</button>
         </form>
@@ -319,6 +320,8 @@
     if(location) params.set('location',location);
     window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
   }
+
+  function setupSuggest(inputId,boxId,type){const input=document.getElementById(inputId),box=document.getElementById(boxId);let t;input.addEventListener('input',()=>{clearTimeout(t);const v=input.value.trim();if(v.length<2){box.classList.remove('show');return}t=setTimeout(async()=>{const r=await fetch('/api/suggest.php?type='+type+'&q='+encodeURIComponent(v));const d=await r.json();box.innerHTML=(d.results||[]).map(x=>'<button type="button">'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</button>').join('');box.querySelectorAll('button').forEach(b=>b.onclick=()=>{input.value=b.textContent;box.classList.remove('show')});box.classList.toggle('show',!!d.results?.length)},180)});document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==input)box.classList.remove('show')})}setupSuggest('keyword','jobSuggestions','job');setupSuggest('location','locationSuggestions','location');
 
   document.getElementById('jobSearch').addEventListener('submit',function(e){
     e.preventDefault();
