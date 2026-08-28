@@ -66,12 +66,14 @@ footer{background:#fff;border-top:1px solid var(--line);padding:24px 0;color:#8a
   .job{padding:18px}
 }
 </style>
+<script src="/push-config.js"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 </head>
 <body>
 <header>
   <div class="wrap topbar">
     <a class="brand" href="/">Jobs<strong>Other</strong></a>
-    <a class="back-home" href="/">← Back to home</a>
+    <div style="display:flex;gap:10px;align-items:center"><button id="pushAlertsBtn" type="button" style="border:1px solid #ffd4b4;background:#fff7f1;color:#dc6710;padding:9px 12px;border-radius:8px;font-weight:700;cursor:pointer">🔔 Alert me to new jobs</button><a class="back-home" href="/">← Back to home</a></div>
   </div>
 </header>
 
@@ -191,6 +193,36 @@ async function load(){
   }
 }
 load();
+
+async function enablePushAlerts(){
+  if(!window.JOBSOTHER_ONESIGNAL_APP_ID){
+    alert('Job alerts are being activated. Please try again shortly.');
+    return;
+  }
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function(OneSignal){
+    try{
+      await OneSignal.init({appId: window.JOBSOTHER_ONESIGNAL_APP_ID});
+      if(!OneSignal.Notifications.isPushSupported()){
+        alert('Push notifications are not supported in this browser.');
+        return;
+      }
+      await OneSignal.Notifications.requestPermission();
+      if(OneSignal.Notifications.permission){
+        const tags={job_alerts:'search', alert_source:'results'};
+        if(q) tags.job_keyword=q.toLowerCase().slice(0,120);
+        if(loc) tags.job_location=loc.toLowerCase().slice(0,120);
+        OneSignal.User.addTags(tags);
+        const btn=document.getElementById('pushAlertsBtn');
+        if(btn){btn.textContent='✓ Alerts On';btn.disabled=true;}
+      }
+    }catch(e){
+      console.error(e);
+      alert('Could not enable job alerts right now.');
+    }
+  });
+}
+document.getElementById('pushAlertsBtn')?.addEventListener('click', enablePushAlerts);
 </script>
 </body>
 </html>
