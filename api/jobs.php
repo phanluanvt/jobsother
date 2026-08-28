@@ -89,8 +89,13 @@ if (!is_array($data)) {
 }
 
 $results = [];
+$seen = [];
 foreach (($data['results'] ?? []) as $job) {
     if (!is_array($job)) continue;
+    $dedupeKey = mb_strtolower(trim((string)($job['title'] ?? ''))) . '|' . mb_strtolower(trim((string)($job['company']['display_name'] ?? ''))) . '|' . mb_strtolower(trim((string)($job['location']['display_name'] ?? '')));
+    $hash = hash('sha256', $dedupeKey);
+    if (isset($seen[$hash])) continue;
+    $seen[$hash] = true;
     $results[] = [
         'id' => $job['id'] ?? null,
         'title' => $job['title'] ?? 'Untitled job',
