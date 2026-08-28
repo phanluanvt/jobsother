@@ -104,6 +104,12 @@ foreach (($data['results'] ?? []) as $job) {
         'contract_time' => $job['contract_time'] ?? '',
         'contract_type' => $job['contract_type'] ?? '',
         'category' => $job['category']['label'] ?? '',
+        'source' => 'Adzuna',
+        'latitude' => $job['latitude'] ?? null,
+        'longitude' => $job['longitude'] ?? null,
+        'salary_currency' => 'CAD',
+        'salary_period' => null,
+        'is_new' => !empty($job['created']) && strtotime((string)$job['created']) >= time() - 172800,
     ];
 }
 
