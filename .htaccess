@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteRule ^jobs/([^/]+)/([^/]+)/?$ /seo-jobs.php?keyword=$1&location=$2 [L,QSA]
+RewriteRule ^jobs/([^/]+)/?$ /seo-jobs.php?keyword=$1 [L,QSA]
