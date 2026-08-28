@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JobsOther — Find Jobs Online</title>
+  <meta name="description" content="Search jobs by title, keyword and location with JobsOther." />
+  <style>
+    :root{
+      --blue:#155eef;--blue2:#0b49c8;--ink:#172033;--muted:#667085;
+      --line:#e4e7ec;--bg:#f7f9fc;--white:#fff;--green:#12b76a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+    header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:800;font-size:26px;color:var(--blue);letter-spacing:-.7px}
+    .brand span{color:var(--ink)}
+    .links{display:flex;gap:24px;align-items:center;color:#475467;font-size:14px}
+    .post{padding:11px 17px;border:1px solid var(--blue);color:var(--blue);border-radius:10px;font-weight:700}
+    .hero{background:linear-gradient(135deg,#0b49c8,#155eef);padding:82px 0 92px;color:white}
+    .hero h1{font-size:48px;line-height:1.06;max-width:760px;margin:0 0 16px;letter-spacing:-1.6px}
+    .hero p{font-size:18px;opacity:.9;margin:0 0 32px}
+    .searchbox{background:white;border-radius:16px;padding:10px;display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;box-shadow:0 18px 45px rgba(14,30,68,.22)}
+    .field{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:0 14px;height:56px}
+    .field input{border:0;outline:0;width:100%;font-size:16px;color:var(--ink)}
+    button{border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:16px;padding:0 28px;cursor:pointer}
+    button:hover{background:var(--blue2)}
+    section{padding:56px 0}
+    .section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:24px}
+    h2{margin:0;font-size:28px;letter-spacing:-.5px}
+    .section-head p{margin:6px 0 0;color:var(--muted)}
+    .jobs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .job{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;transition:.2s}
+    .job:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(16,24,40,.08)}
+    .tag{display:inline-block;color:#067647;background:#ecfdf3;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:14px}
+    .job h3{margin:0 0 8px;font-size:18px}
+    .company{color:#475467;font-size:14px;margin-bottom:15px}
+    .meta{display:grid;gap:7px;color:#667085;font-size:14px}
+    .job .apply{display:block;margin-top:18px;color:var(--blue);font-weight:800;font-size:14px}
+    .alert{background:#101828;color:#fff;border-radius:18px;padding:34px;display:flex;align-items:center;justify-content:space-between;gap:30px}
+    .alert h2{margin-bottom:8px}
+    .alert p{margin:0;color:#d0d5dd}
+    footer{background:#fff;border-top:1px solid var(--line);padding:28px 0;color:#667085;font-size:14px}
+    .footer{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .footer-links{display:flex;gap:18px}
+    .status{padding:12px 0 0;color:#dbe7ff;font-size:14px}
+    @media(max-width:800px){
+      .links a:not(.post){display:none}.hero{padding:58px 0}.hero h1{font-size:36px}
+      .searchbox{grid-template-columns:1fr}.searchbox button{height:54px}.jobs{grid-template-columns:1fr}
+      .alert{align-items:flex-start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#">Jobs<span>Other</span></a>
+    <nav class="links">
+      <a href="#jobs">Find Jobs</a>
+      <a href="#alerts">Job Alerts</a>
+      <a href="#">About</a>
+      <a class="post" href="#">Post a Job</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <h1>Find jobs that fit your life.</h1>
+      <p>Search opportunities by title, keyword and location.</p>
+      <form class="searchbox" id="jobSearch">
+        <label class="field">
+          <span>🔎</span>
+          <input id="keyword" placeholder="Job title or keywords" />
+        </label>
+        <label class="field">
+          <span>📍</span>
+          <input id="location" placeholder="City, province or postcode" />
+        </label>
+        <button type="submit">Search Jobs</button>
+      </form>
+      <div class="status">Prototype version — live job API will be connected next.</div>
+    </div>
+  </section>
+
+  <section id="jobs">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Featured jobs</h2>
+          <p>Sample listings for the first JobsOther prototype.</p>
+        </div>
+      </div>
+      <div class="jobs" id="jobsGrid">
+        <article class="job" data-title="delivery driver" data-location="vancouver">
+          <span class="tag">New</span>
+          <h3>Delivery Driver</h3>
+          <div class="company">Metro Logistics</div>
+          <div class="meta"><span>📍 Vancouver, BC</span><span>💵 $23–$28/hour</span><span>🕒 Full-time</span></div>
+          <a class="apply" href="#">View job →</a>
+        </article>
+        <article class="job" data-title="warehouse associate" data-location="burnaby">
+          <span class="tag">Hiring</span>
+          <h3>Warehouse Associate</h3>
+          <div class="company">Northline Supply</div>
+          <div class="meta"><span>📍 Burnaby, BC</span><span>💵 $21–$25/hour</span><span>🕒 Full-time</span></div>
+          <a class="apply" href="#">View job →</a>
+        </article>
+        <article class="job" data-title="customer service representative" data-location="surrey">
+          <span class="tag">Remote option</span>
+          <h3>Customer Service Representative</h3>
+          <div class="company">Pacific Connect</div>
+          <div class="meta"><span>📍 Surrey, BC</span><span>💵 $22/hour</span><span>🕒 Full-time</span></div>
+          <a class="apply" href="#">View job →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="alerts">
+    <div class="wrap">
+      <div class="alert">
+        <div>
+          <h2>Get new jobs in your inbox</h2>
+          <p>Job alerts will be connected after the live search/API version is ready.</p>
+        </div>
+        <a class="post" style="background:white;border-color:white;color:#155eef" href="#">Create Job Alert</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer">
+    <div>© 2026 JobsOther. All rights reserved.</div>
+    <div class="footer-links"><a href="#">About</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('jobSearch').addEventListener('submit', function(e){
+    e.preventDefault();
+    const keyword = document.getElementById('keyword').value.toLowerCase().trim();
+    const location = document.getElementById('location').value.toLowerCase().trim();
+    document.querySelectorAll('.job').forEach(job => {
+      const titleOk = !keyword || job.dataset.title.includes(keyword);
+      const locationOk = !location || job.dataset.location.includes(location);
+      job.style.display = titleOk && locationOk ? '' : 'none';
+    });
+    document.getElementById('jobs').scrollIntoView({behavior:'smooth'});
+  });
+</script>
+</body>
+</html>
