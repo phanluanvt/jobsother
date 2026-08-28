@@ -205,6 +205,8 @@
       .footer-links{justify-content:center}
     }
   </style>
+  <script src="/push-config.js"></script>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 </head>
 <body>
 <header>
@@ -214,7 +216,7 @@
       <a href="/jobs.html">Find Jobs</a>
       <a href="/job-alerts.html">Job Alerts</a>
       <a href="/about.html">About</a>
-      <a class="post-btn" href="/post-a-job.html">Post a Job</a>
+      <button class="post-btn" id="pushAlertsBtn" type="button" style="cursor:pointer">🔔 Get Job Alerts</button>
     </nav>
   </div>
 </header>
@@ -312,6 +314,33 @@
       runSearch();
     });
   });
+
+  async function enablePushAlerts(){
+    if(!window.JOBSOTHER_ONESIGNAL_APP_ID){
+      alert('Job alerts are being activated. Please try again shortly.');
+      return;
+    }
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try{
+        await OneSignal.init({appId: window.JOBSOTHER_ONESIGNAL_APP_ID});
+        if(!OneSignal.Notifications.isPushSupported()){
+          alert('Push notifications are not supported in this browser.');
+          return;
+        }
+        await OneSignal.Notifications.requestPermission();
+        if(OneSignal.Notifications.permission){
+          OneSignal.User.addTags({job_alerts:'all_jobs', alert_source:'homepage'});
+          const btn=document.getElementById('pushAlertsBtn');
+          if(btn){btn.textContent='✓ Job Alerts On';btn.disabled=true;}
+        }
+      }catch(e){
+        console.error(e);
+        alert('Could not enable job alerts right now.');
+      }
+    });
+  }
+  document.getElementById('pushAlertsBtn')?.addEventListener('click', enablePushAlerts);
 </script>
 </body>
 </html>
