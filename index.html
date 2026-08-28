@@ -230,8 +230,9 @@
     <a class="brand" href="/">Jobs<strong>Other</strong></a>
     <nav class="nav-links">
       <a href="/jobs.html">Find Jobs</a>
+      <a href="/popular-jobs.html">Popular Jobs</a>
+      <a href="/career-advice.html">Career Advice</a>
       <a href="/job-alerts.html">Job Alerts</a>
-      <a href="/about.html">About</a>
       <button class="post-btn" id="pushAlertsBtn" type="button" style="cursor:pointer">🔔 Get Job Alerts</button>
     </nav>
   </div>
@@ -258,6 +259,7 @@
         </form>
       </div>
 
+      <div style="margin-top:14px"><button id="useLocation" type="button" style="border:0;background:transparent;color:#d8610d;font-weight:700;cursor:pointer">⌖ Use my location</button></div>
       <div class="popular">
         Popular:
         <a href="#" data-q="driver">Driver</a>
@@ -321,6 +323,19 @@
   document.getElementById('jobSearch').addEventListener('submit',function(e){
     e.preventDefault();
     runSearch();
+  });
+
+  document.getElementById('useLocation')?.addEventListener('click',function(){
+    if(!navigator.geolocation){alert('Location is not supported in this browser.');return;}
+    this.textContent='Finding location…';
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
+        const d=await r.json();
+        document.getElementById('location').value=d.location||'';
+      }catch(e){}
+      this.textContent='⌖ Use my location';
+    },()=>{this.textContent='⌖ Use my location';alert('Location permission was not granted.');});
   });
 
   document.querySelectorAll('[data-q]').forEach(function(link){
