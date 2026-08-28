@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Job Search | JobsOther</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#333;background:#f7f7f7}
+header{background:#fff;border-bottom:1px solid #ddd;padding:20px}.wrap{max-width:1000px;margin:auto}
+.brand{font-size:27px;font-weight:700;text-decoration:none;color:#2b2b2b}.brand strong{color:#e67817}
+.search{display:flex;gap:8px;margin:22px 0}.search input{flex:1;height:48px;padding:0 13px;border:1px solid #ccc;border-radius:3px;font-size:15px}
+.search button{border:0;border-radius:3px;background:#ef7d19;color:white;font-weight:700;padding:0 24px;font-size:16px;cursor:pointer}
+main{padding:28px 20px}.content{max-width:1000px;margin:auto}.title{font-size:25px;font-weight:500;margin:0 0 8px}.count{color:#777;margin-bottom:20px}
+.job{background:#fff;border:1px solid #ddd;border-radius:3px;padding:20px;margin-bottom:12px}.job h2{font-size:19px;margin:0 0 8px;color:#e67817}.job .company{font-weight:700;margin-bottom:6px}.meta{color:#777;font-size:14px;margin-bottom:12px}.desc{font-size:14px;line-height:1.5;color:#555}.apply{display:inline-block;margin-top:13px;color:#e67817;font-weight:700;text-decoration:none}
+.notice{background:#fff;border:1px solid #ddd;padding:25px;text-align:center;color:#777}
+footer{text-align:center;padding:25px;color:#888;font-size:13px}
+@media(max-width:650px){.search{display:block}.search input,.search button{width:100%;height:48px;margin-bottom:8px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="/">Jobs<strong>Other</strong></a>
+<form class="search" id="search"><input id="q" placeholder="Job Title, Keywords..."><input id="loc" placeholder="Enter location/area/postcode..."><button>Search Jobs</button></form></div></header>
+<main><div class="content">
+<h1 class="title" id="heading">Job Search Results</h1>
+<div class="count">JobsOther search</div>
+<div id="results"></div>
+</div></main>
+<footer>Copyright © 2026 JobsOther. All Rights Reserved.</footer>
+<script>
+const params=new URLSearchParams(location.search);
+const q=params.get('q')||''; const loc=params.get('location')||'';
+document.getElementById('q').value=q;document.getElementById('loc').value=loc;
+document.getElementById('heading').textContent=(q? q+' jobs':'Jobs')+(loc?' in '+loc:'');
+document.getElementById('search').addEventListener('submit',e=>{e.preventDefault();const p=new URLSearchParams();if(qv.value.trim())p.set('q',qv.value.trim());if(lv.value.trim())p.set('location',lv.value.trim());location.href='/jobs.html?'+p});
+const qv=document.getElementById('q'),lv=document.getElementById('loc');
+document.getElementById('results').innerHTML='<div class="notice"><strong>Live job results are the next step.</strong><br><br>The search page is ready. We will connect the job-data API here so searches return real vacancies.</div>';
+</script>
+</body></html>
