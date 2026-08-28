@@ -207,6 +207,22 @@
   </style>
   <script src="/push-config.js"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
+  <style>
+    .push-overlay{position:fixed;inset:0;background:rgba(17,24,39,.38);display:none;align-items:flex-start;justify-content:center;padding:96px 18px 20px;z-index:9999}
+    .push-overlay.show{display:flex}
+    .push-card{width:min(420px,100%);background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.22);padding:22px;border:1px solid #eee}
+    .push-head{display:flex;gap:13px;align-items:flex-start}
+    .push-bell{width:46px;height:46px;display:grid;place-items:center;border-radius:13px;background:#fff3e8;font-size:23px;flex:0 0 46px}
+    .push-card h3{margin:0 0 6px;font-size:20px;color:#222}
+    .push-card p{margin:0;color:#667085;font-size:14px;line-height:1.5}
+    .push-actions{display:flex;gap:10px;margin-top:20px}
+    .push-primary,.push-secondary{flex:1;height:44px;border-radius:9px;font-weight:800;cursor:pointer}
+    .push-primary{border:0;background:#f47a1f;color:#fff}
+    .push-primary:hover{background:#dc6710}
+    .push-secondary{border:1px solid #ddd;background:#fff;color:#596273}
+    @media(max-width:520px){.push-overlay{padding-top:70px}.push-actions{flex-direction:column}}
+  </style>
 </head>
 <body>
 <header>
@@ -341,6 +357,41 @@
     });
   }
   document.getElementById('pushAlertsBtn')?.addEventListener('click', enablePushAlerts);
+</script>
+
+<div class="push-overlay" id="pushOverlay" role="dialog" aria-modal="true" aria-labelledby="pushTitle">
+  <div class="push-card">
+    <div class="push-head">
+      <div class="push-bell">🔔</div>
+      <div><h3 id="pushTitle">Get new job alerts</h3><p>Be the first to know when new jobs are available in your area.</p></div>
+    </div>
+    <div class="push-actions">
+      <button class="push-primary" id="pushYes" type="button">Yes, notify me</button>
+      <button class="push-secondary" id="pushLater" type="button">Not now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const overlay=document.getElementById('pushOverlay');
+  const yes=document.getElementById('pushYes');
+  const later=document.getElementById('pushLater');
+  const key='jobsother_push_prompt_dismissed';
+  try{
+    if(!localStorage.getItem(key)){
+      setTimeout(()=>overlay?.classList.add('show'),2200);
+    }
+  }catch(e){setTimeout(()=>overlay?.classList.add('show'),2200);}
+  later?.addEventListener('click',()=>{
+    overlay?.classList.remove('show');
+    try{localStorage.setItem(key,String(Date.now()));}catch(e){}
+  });
+  yes?.addEventListener('click',async()=>{
+    overlay?.classList.remove('show');
+    await enablePushAlerts();
+  });
+})();
 </script>
 </body>
 </html>
