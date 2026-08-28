@@ -3,191 +3,315 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>JobsOther | Jobs In Your Area</title>
-  <meta name="description" content="Search jobs in your area with JobsOther.">
+  <title>JobsOther | Find Jobs Near You</title>
+  <meta name="description" content="Search jobs by title, keyword and location with JobsOther.">
   <style>
+    :root{
+      --orange:#f47a1f;
+      --orange-dark:#dc6710;
+      --ink:#202733;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --soft:#f7f8fa;
+      --white:#fff;
+    }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
     body{
-      font-family:Arial,Helvetica,sans-serif;
-      background:#fff;
-      color:#333;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      color:var(--ink);
+      background:var(--soft);
       min-height:100vh;
       display:flex;
       flex-direction:column;
     }
-    .page{
-      flex:1;
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+    header{
+      height:72px;
+      background:#fff;
+      border-bottom:1px solid var(--line);
       display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      padding:72px 20px 40px;
+      align-items:center;
     }
-    .search-area{
-      width:100%;
-      max-width:980px;
-      text-align:center;
-    }
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
     .brand{
-      display:inline-block;
-      font-size:31px;
-      font-weight:700;
-      letter-spacing:-1px;
-      color:#2b2b2b;
-      margin-bottom:44px;
-      text-decoration:none;
+      font-size:27px;
+      font-weight:800;
+      letter-spacing:-.8px;
+      color:#23272f;
     }
-    .brand strong{color:#e67817}
+    .brand strong{color:var(--orange)}
+    .nav-links{display:flex;align-items:center;gap:24px;font-size:14px;color:#596273}
+    .nav-links a:hover{color:var(--orange)}
+    .post-btn{
+      border:1px solid #ffd4b4;
+      background:#fff7f1;
+      color:var(--orange-dark)!important;
+      padding:10px 14px;
+      border-radius:9px;
+      font-weight:700;
+    }
+
+    .hero{
+      background:
+        radial-gradient(circle at 20% 20%,rgba(244,122,31,.10),transparent 33%),
+        linear-gradient(180deg,#fff,#fffaf7);
+      border-bottom:1px solid #f1e6df;
+      padding:76px 0 64px;
+    }
+    .hero-inner{text-align:center}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:7px 11px;
+      border-radius:999px;
+      background:#fff4eb;
+      color:#b45309;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:20px;
+    }
     h1{
-      margin:0 0 12px;
-      font-size:34px;
-      line-height:1.2;
-      font-weight:500;
-      color:#444;
+      margin:0;
+      font-size:48px;
+      line-height:1.08;
+      letter-spacing:-1.7px;
+      font-weight:800;
+      color:#1f2937;
     }
     .subtitle{
-      margin:0 0 32px;
+      margin:16px auto 30px;
+      max-width:700px;
+      color:#667085;
       font-size:18px;
-      color:#666;
-      font-weight:400;
+      line-height:1.55;
+    }
+    .search-shell{
+      max-width:980px;
+      margin:0 auto;
+      background:#fff;
+      border:1px solid #ececec;
+      border-radius:16px;
+      padding:10px;
+      box-shadow:0 18px 45px rgba(16,24,40,.10);
     }
     .search-form{
-      display:flex;
-      justify-content:center;
-      align-items:stretch;
+      display:grid;
+      grid-template-columns:1.2fr 1fr auto;
       gap:10px;
-      max-width:900px;
-      margin:0 auto;
     }
-    .search-form input{
-      height:52px;
-      border:1px solid #cfcfcf;
-      border-radius:3px;
-      padding:0 15px;
-      font-size:16px;
-      outline:none;
+    .field{
+      height:58px;
+      border:1px solid #d8dce3;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:0 14px;
       background:#fff;
-      color:#333;
     }
-    .search-form input:focus{
-      border-color:#999;
-      box-shadow:0 0 0 1px #999;
+    .field:focus-within{
+      border-color:#f0a36c;
+      box-shadow:0 0 0 3px rgba(244,122,31,.08);
     }
-    .keyword{flex:1.15}
-    .location{flex:1}
-    .search-form button{
-      min-width:140px;
+    .icon{font-size:18px;opacity:.7}
+    .field input{
+      width:100%;
       border:0;
-      border-radius:3px;
-      background:#ef7d19;
+      outline:0;
+      font-size:16px;
+      color:#202733;
+      background:transparent;
+    }
+    .search-form button{
+      border:0;
+      border-radius:10px;
+      padding:0 27px;
+      min-width:150px;
+      background:var(--orange);
       color:#fff;
-      font-size:17px;
-      font-weight:700;
+      font-size:16px;
+      font-weight:800;
       cursor:pointer;
-      padding:0 25px;
+      box-shadow:0 8px 18px rgba(244,122,31,.22);
     }
-    .search-form button:hover{background:#d96d10}
+    .search-form button:hover{background:var(--orange-dark)}
     .popular{
-      margin-top:22px;
+      margin-top:18px;
+      color:#8a93a3;
       font-size:13px;
-      color:#888;
     }
-    .popular a{color:#777;text-decoration:none}
-    .popular a:hover{text-decoration:underline}
+    .popular a{
+      color:#596273;
+      font-weight:700;
+      margin:0 4px;
+    }
+    .popular a:hover{color:var(--orange)}
+
+    .features{padding:38px 0 50px}
+    .feature-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+    .feature{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:22px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .feature-icon{
+      width:42px;height:42px;flex:0 0 42px;
+      display:grid;place-items:center;
+      border-radius:11px;
+      background:#fff2e8;
+      font-size:20px;
+    }
+    .feature h3{margin:0 0 6px;font-size:16px}
+    .feature p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+
     footer{
-      border-top:1px solid #e3e3e3;
-      background:#fafafa;
-      padding:23px 20px 27px;
-      text-align:center;
+      margin-top:auto;
+      background:#fff;
+      border-top:1px solid var(--line);
+      padding:24px 0 28px;
+      color:#7b8494;
       font-size:13px;
-      color:#777;
     }
-    .footer-links{
-      margin-bottom:14px;
-      line-height:2;
+    .footer-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
     }
-    .footer-links a{
-      color:#666;
-      text-decoration:none;
-      margin:0 7px;
-      white-space:nowrap;
-    }
-    .footer-links a:hover{text-decoration:underline}
-    .copyright{color:#999}
-    @media(max-width:720px){
-      .page{padding-top:48px}
-      .brand{margin-bottom:34px}
-      h1{font-size:29px}
+    .footer-links{display:flex;flex-wrap:wrap;gap:16px}
+    .footer-links a:hover{color:var(--orange)}
+
+    @media(max-width:760px){
+      .nav-links a:not(.post-btn){display:none}
+      .hero{padding:52px 0 44px}
+      h1{font-size:36px}
       .subtitle{font-size:16px}
-      .search-form{display:block}
-      .search-form input,
-      .search-form button{
-        width:100%;
-        height:52px;
-        margin-bottom:10px;
-      }
+      .search-form{grid-template-columns:1fr}
+      .search-form button{height:56px}
+      .feature-grid{grid-template-columns:1fr}
+      .footer-row{justify-content:center;text-align:center}
+      .footer-links{justify-content:center}
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="search-area">
-      <a class="brand" href="/">Jobs<strong>Other</strong></a>
-      <h1>Search for Jobs</h1>
-      <p class="subtitle">Search all jobs in your area</p>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/">Jobs<strong>Other</strong></a>
+    <nav class="nav-links">
+      <a href="/jobs.html">Find Jobs</a>
+      <a href="/job-alerts.html">Job Alerts</a>
+      <a href="/about.html">About</a>
+      <a class="post-btn" href="/post-a-job.html">Post a Job</a>
+    </nav>
+  </div>
+</header>
 
-      <form class="search-form" id="jobSearch">
-        <input class="keyword" id="keyword" name="q" type="text" placeholder="Job Title, Keywords..." autocomplete="off">
-        <input class="location" id="location" name="location" type="text" placeholder="Enter location/area/postcode..." autocomplete="off">
-        <button type="submit">Search Jobs</button>
-      </form>
+<main>
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="eyebrow">● Fresh jobs updated daily</div>
+      <h1>Find the right job, faster.</h1>
+      <p class="subtitle">Search thousands of opportunities across Canada by job title, keyword and location.</p>
+
+      <div class="search-shell">
+        <form class="search-form" id="jobSearch">
+          <label class="field">
+            <span class="icon">⌕</span>
+            <input id="keyword" name="q" type="text" placeholder="Job title or keywords" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="icon">⌖</span>
+            <input id="location" name="location" type="text" placeholder="City, province or postcode" autocomplete="off">
+          </label>
+          <button type="submit">Search Jobs</button>
+        </form>
+      </div>
 
       <div class="popular">
-        Popular searches:
-        <a href="#" data-q="driver">Driver</a> ·
-        <a href="#" data-q="warehouse">Warehouse</a> ·
-        <a href="#" data-q="customer service">Customer Service</a> ·
+        Popular:
+        <a href="#" data-q="driver">Driver</a>
+        <a href="#" data-q="warehouse">Warehouse</a>
+        <a href="#" data-q="customer service">Customer Service</a>
         <a href="#" data-q="remote">Remote</a>
       </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-links">
-      <a href="/job-alerts.html">Job Alerts</a> •
-      <a href="/about.html">About Us</a> •
-      <a href="/terms.html">Terms of Use</a> •
-      <a href="/privacy.html">Privacy Policy</a> •
-      <a href="/cookie.html">Cookie Policy</a> •
-      <a href="/email-policy.html">E-mail Policy</a> •
-      <a href="/contact.html">Contact Us</a> •
-      <a href="/post-a-job.html">Post a Job</a>
     </div>
-    <div class="copyright">Copyright © 2026 JobsOther. All Rights Reserved.</div>
-  </footer>
+  </section>
 
-  <script>
-    function runSearch(){
-      const q=document.getElementById('keyword').value.trim();
-      const location=document.getElementById('location').value.trim();
-      const params=new URLSearchParams();
-      if(q) params.set('q',q);
-      if(location) params.set('location',location);
-      window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
-    }
+  <section class="features">
+    <div class="wrap feature-grid">
+      <div class="feature">
+        <div class="feature-icon">🔎</div>
+        <div>
+          <h3>Search quickly</h3>
+          <p>Find openings by keyword and location in just a few seconds.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📍</div>
+        <div>
+          <h3>Local opportunities</h3>
+          <p>Discover jobs near you across cities and regions in Canada.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">↗</div>
+        <div>
+          <h3>Apply at the source</h3>
+          <p>Open the original listing and continue your application securely.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
-    document.getElementById('jobSearch').addEventListener('submit',function(e){
+<footer>
+  <div class="wrap footer-row">
+    <div>© 2026 JobsOther. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="/about.html">About</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/cookie.html">Cookies</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function runSearch(){
+    const q=document.getElementById('keyword').value.trim();
+    const location=document.getElementById('location').value.trim();
+    const params=new URLSearchParams();
+    if(q) params.set('q',q);
+    if(location) params.set('location',location);
+    window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
+  }
+
+  document.getElementById('jobSearch').addEventListener('submit',function(e){
+    e.preventDefault();
+    runSearch();
+  });
+
+  document.querySelectorAll('[data-q]').forEach(function(link){
+    link.addEventListener('click',function(e){
       e.preventDefault();
+      document.getElementById('keyword').value=this.dataset.q;
       runSearch();
     });
-
-    document.querySelectorAll('[data-q]').forEach(function(link){
-      link.addEventListener('click',function(e){
-        e.preventDefault();
-        document.getElementById('keyword').value=this.dataset.q;
-        runSearch();
-      });
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
