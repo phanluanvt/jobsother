@@ -97,8 +97,8 @@ footer{background:#fff;border-top:1px solid var(--line);padding:24px 0;color:#8a
 <div class="search-strip">
   <div class="wrap">
     <form class="search" id="search">
-      <input id="q" placeholder="Job title or keywords">
-      <input id="loc" placeholder="City, province or postcode">
+      <input id="q" list="jobHints" placeholder="Job title or keywords"><datalist id="jobHints"><option>Warehouse Associate</option><option>Delivery Driver</option><option>Customer Service</option><option>Administrative Assistant</option><option>Cashier</option></datalist>
+      <input id="loc" list="locHints" placeholder="City, province or postcode"><datalist id="locHints"><option>Vancouver, BC</option><option>Burnaby, BC</option><option>Surrey, BC</option><option>Toronto, ON</option><option>Calgary, AB</option></datalist>
       <button>Search Jobs</button>
     </form>
   </div>
@@ -202,7 +202,7 @@ async function load(){
         '</div></div>'+
         '<div class="meta">'+newBadge+meta.join('')+(age!==null?'<span class="badge">Posted '+(age===0?'today':age+'d ago')+'</span>':'')+'</div>'+
         '<div class="desc">'+esc(desc)+(desc.length>=320?'…':'')+'</div>'+
-        '<button class="apply preview-btn" type="button" data-id="'+esc(job.id||'')+'">View Job →</button>'+
+        '<a class="apply" href="/job.html?id='+encodeURIComponent(job.id||'')+'&q='+encodeURIComponent(q)+'&location='+encodeURIComponent(loc)+'">View Job →</a>'+
         '<button class="save-btn" type="button" data-save="'+esc(job.id||'')+'">♡ Save</button>'+
       '</article>';
     }).join('');
@@ -220,7 +220,7 @@ async function load(){
 }
 function savedIds(){try{return JSON.parse(localStorage.getItem('jobsother_saved_jobs')||'[]')}catch(e){return[]}}
 function bindJobActions(){
-  document.querySelectorAll('.preview-btn').forEach(btn=>btn.addEventListener('click',()=>showJob(btn.dataset.id)));
+  document.querySelectorAll('.job').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('a,button'))return;showJob(card.dataset.id)}));
   document.querySelectorAll('[data-save]').forEach(btn=>btn.addEventListener('click',()=>{let ids=savedIds();const id=btn.dataset.save;if(ids.includes(id)){ids=ids.filter(x=>x!==id);btn.textContent='♡ Save'}else{ids.push(id);btn.textContent='♥ Saved'}localStorage.setItem('jobsother_saved_jobs',JSON.stringify(ids));}));
   if(window.__jobs?.[0]) showJob(window.__jobs[0].id);
 }
