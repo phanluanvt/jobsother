@@ -34,7 +34,16 @@ $perPage = min(50, max(1, (int)($_GET['results_per_page'] ?? 20)));
 
 $allowedCountries = ['ca', 'us', 'gb', 'au', 'nz'];
 if (!in_array($country, $allowedCountries, true)) {
-    $country = 'ca';
+    http_response_code(200);
+    echo json_encode([
+        'count' => 0,
+        'page' => $page,
+        'results' => [],
+        'unsupported_country' => true,
+        'country' => $country,
+        'message' => 'Job search is not yet available from our current provider in this country.'
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 $params = [
@@ -112,7 +121,7 @@ foreach (($data['results'] ?? []) as $job) {
         'source' => 'Adzuna',
         'latitude' => $job['latitude'] ?? null,
         'longitude' => $job['longitude'] ?? null,
-        'salary_currency' => 'CAD',
+        'salary_currency' => strtoupper($country) === 'US' ? 'USD' : (strtoupper($country) === 'GB' ? 'GBP' : (strtoupper($country) === 'AU' ? 'AUD' : (strtoupper($country) === 'NZ' ? 'NZD' : 'CAD'))),
         'salary_period' => null,
         'is_new' => !empty($job['created']) && strtotime((string)$job['created']) >= time() - 172800,
     ];
