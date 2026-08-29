@@ -165,7 +165,12 @@
       display:flex;
       gap:14px;
       align-items:flex-start;
+      cursor:pointer;
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
     }
+    .feature:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(16,24,40,.08);border-color:#f4c7a5}
+    .feature:focus-visible{outline:3px solid rgba(244,122,31,.22);outline-offset:3px}
+    .feature-cta{display:inline-block;margin-top:10px;color:var(--orange-dark);font-size:13px;font-weight:800}
     .feature-icon{
       width:42px;height:42px;flex:0 0 42px;
       display:grid;place-items:center;
@@ -273,27 +278,30 @@
 
   <section class="features">
     <div class="wrap feature-grid">
-      <div class="feature">
-        <div class="feature-icon">🔎</div>
-        <div>
-          <h3>Search quickly</h3>
-          <p>Find openings by keyword and location in just a few seconds.</p>
-        </div>
-      </div>
-      <div class="feature">
+      <div class="feature" id="nearbyJobsCard" role="button" tabindex="0">
         <div class="feature-icon">📍</div>
         <div>
-          <h3>Local opportunities</h3>
-          <p>Discover jobs near you across cities and regions in Canada.</p>
+          <h3>Jobs Near You</h3>
+          <p>Use your current location to discover opportunities nearby.</p>
+          <span class="feature-cta">Explore nearby jobs →</span>
         </div>
       </div>
-      <div class="feature">
-        <div class="feature-icon">↗</div>
+      <a class="feature" href="/jobs.html?sort=newest">
+        <div class="feature-icon">🔥</div>
         <div>
-          <h3>Apply at the source</h3>
-          <p>Open the original listing and continue your application securely.</p>
+          <h3>Hiring Now</h3>
+          <p>Discover recently posted jobs and fresh opportunities across Canada.</p>
+          <span class="feature-cta">See new jobs →</span>
         </div>
-      </div>
+      </a>
+      <a class="feature" href="/job-alerts.html">
+        <div class="feature-icon">🔔</div>
+        <div>
+          <h3>Job Alerts</h3>
+          <p>Get new jobs matching your search delivered straight to you.</p>
+          <span class="feature-cta">Create an alert →</span>
+        </div>
+      </a>
     </div>
   </section>
 </main>
@@ -327,6 +335,31 @@
     e.preventDefault();
     runSearch();
   });
+
+  async function openNearbyJobs(){
+    if(!navigator.geolocation){document.getElementById('location').focus();return;}
+    const card=document.getElementById('nearbyJobsCard');
+    const cta=card?.querySelector('.feature-cta');
+    if(cta) cta.textContent='Finding jobs near you…';
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
+        const d=await r.json();
+        const location=d.location||'';
+        window.location.href='/jobs.html?location='+encodeURIComponent(location)+'&radius=25';
+      }catch(e){
+        document.getElementById('location').scrollIntoView({behavior:'smooth',block:'center'});
+        document.getElementById('location').focus();
+        if(cta) cta.textContent='Explore nearby jobs →';
+      }
+    },()=>{
+      document.getElementById('location').scrollIntoView({behavior:'smooth',block:'center'});
+      document.getElementById('location').focus();
+      if(cta) cta.textContent='Enter your city above →';
+    });
+  }
+  document.getElementById('nearbyJobsCard')?.addEventListener('click',openNearbyJobs);
+  document.getElementById('nearbyJobsCard')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNearbyJobs();}});
 
   document.getElementById('useLocation')?.addEventListener('click',function(){
     if(!navigator.geolocation){alert('Location is not supported in this browser.');return;}
