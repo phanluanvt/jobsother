@@ -268,7 +268,7 @@
     <div class="wrap hero-inner">
       <div class="eyebrow">● Fresh jobs updated daily</div>
       <h1>Find the right job, faster.</h1>
-      <p class="subtitle">Search thousands of opportunities across Canada by job title, keyword and location.</p>
+      <p class="subtitle">Search jobs by title, keyword and location. We detect your region automatically when possible.</p>
 
       <div class="search-shell">
         <form class="search-form" id="jobSearch">
@@ -326,8 +326,8 @@
   <section style="padding:0 0 52px">
     <div class="wrap">
       <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px">
-        <h2 style="margin:0 0 8px;font-size:24px">Popular job searches in Canada</h2>
-        <p style="margin:0 0 18px;color:var(--muted);line-height:1.6">Explore frequently searched job types and major Canadian job markets.</p>
+        <h2 style="margin:0 0 8px;font-size:24px">Popular job searches</h2>
+        <p style="margin:0 0 18px;color:var(--muted);line-height:1.6">Explore frequently searched job types and supported job markets.</p>
         <div style="display:flex;flex-wrap:wrap;gap:10px">
           <a href="/jobs/warehouse/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Warehouse Jobs</a><a href="/jobs/delivery-driver/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Delivery Driver Jobs</a><a href="/jobs/customer-service/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Customer Service Jobs</a><a href="/jobs/part-time/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Part-Time Jobs</a><a href="/jobs/work-from-home/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Work From Home Jobs</a><a href="/jobs/remote/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Remote Jobs</a><a href="/jobs/administrative-assistant/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Administrative Assistant Jobs</a><a href="/jobs/cashier/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Cashier Jobs</a><a href="/jobs/cleaner/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Cleaning Jobs</a><a href="/jobs/construction/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Construction Jobs</a><a href="/jobs/healthcare/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Healthcare Jobs</a><a href="/jobs/restaurant/" style="padding:9px 12px;border:1px solid #ffd4b4;border-radius:999px;background:#fff7f1;color:#b45309;font-weight:700;font-size:13px">Restaurant Jobs</a>
         </div>
@@ -360,9 +360,9 @@
 </footer>
 
 <script>
-  let detectedCountry='ca';
+  let detectedCountry='';
   fetch('/api/geoip.php').then(r=>r.json()).then(d=>{
-    detectedCountry=d.country||'ca';
+    detectedCountry=d.country||'';
     const field=document.getElementById('location');
     if(field && !field.value && d.location) field.value=d.location;
     document.documentElement.dataset.country=detectedCountry;
@@ -374,7 +374,7 @@
     const params=new URLSearchParams();
     if(q) params.set('q',q);
     if(location) params.set('location',location);
-    params.set('country',detectedCountry);
+    if(detectedCountry) params.set('country',detectedCountry);
     const lat=document.getElementById('location').dataset.lat,lng=document.getElementById('location').dataset.lng;
     if(lat&&lng){params.set('lat',lat);params.set('lng',lng);params.set('radius','10');}
     window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
@@ -397,7 +397,7 @@
         const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
         const d=await r.json();
         const location=d.location||d.city||'';
-        const p=new URLSearchParams({location,country:d.country||detectedCountry,lat:String(pos.coords.latitude),lng:String(pos.coords.longitude),radius:'10'});
+        const p=new URLSearchParams({location,country:d.country||detectedCountry||'',lat:String(pos.coords.latitude),lng:String(pos.coords.longitude),radius:'10'});
         window.location.href='/jobs.html?'+p.toString();
       }catch(e){
         document.getElementById('location').scrollIntoView({behavior:'smooth',block:'center'});
