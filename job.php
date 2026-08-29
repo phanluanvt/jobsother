@@ -12,6 +12,30 @@ $appId=getenv('ADZUNA_APP_ID')?:''; $appKey=getenv('ADZUNA_APP_KEY')?:'';
 $configPath=dirname(__DIR__).'/jobsother-config.php';
 if((!$appId||!$appKey)&&is_file($configPath)){ $c=require $configPath; if(is_array($c)){ $appId=$appId?:((string)($c['ADZUNA_APP_ID']??'')); $appKey=$appKey?:((string)($c['ADZUNA_APP_KEY']??'')); }}
 if(!$appId||!$appKey){ http_response_code(503); exit('Job service temporarily unavailable.'); }
+$cacheFile=sys_get_temp_dir().'/jobsother-job-'.preg_replace('/[^0-9A-Za-z_-]/','',$id).'.json';
+$j=null;
+if(is_file($cacheFile) && filemtime($cacheFile) >= time()-86400){
+    $cached=json_decode((string)@file_get_contents($cacheFile),true);
+    if(is_array($cached) && (string)($cached['id']??'')===$id){
+        $j=[
+          'id'=>$cached['id']??null,
+          'title'=>$cached['title']??'',
+          'company'=>['display_name'=>$cached['company']??''],
+          'location'=>['display_name'=>$cached['location']??''],
+          'description'=>$cached['description']??'',
+          'created'=>$cached['created']??null,
+          'redirect_url'=>$cached['redirect_url']??'',
+          'salary_min'=>$cached['salary_min']??null,
+          'salary_max'=>$cached['salary_max']??null,
+          'contract_time'=>$cached['contract_time']??'',
+          'contract_type'=>$cached['contract_type']??'',
+          'latitude'=>$cached['latitude']??null,
+          'longitude'=>$cached['longitude']??null
+        ];
+        if(!empty($cached['country']))$country=(string)$cached['country'];
+    }
+}
+if(!is_array($j)){
 $params=['app_id'=>$appId,'app_key'=>$appKey,'results_per_page'=>50,'content-type'=>'application/json'];
 if($q!=='')$params['what']=$q;
 if($where!=='')$params['where']=$where;
@@ -23,6 +47,8 @@ if($body===false||$status<200||$status>=300) fail404();
 $data=json_decode((string)$body,true);$j=null;
 foreach(($data['results']??[]) as $candidate){if((string)($candidate['id']??'')===$id){$j=$candidate;break;}}
 if(!is_array($j)||empty($j['title'])) fail404();
+
+}
 $title=trim((string)$j['title']);$company=trim((string)($j['company']['display_name']??''));$location=trim((string)($j['location']['display_name']??''));$desc=trim(strip_tags((string)($j['description']??'')));$created=(string)($j['created']??'');$apply=(string)($j['redirect_url']??'');$type=(string)($j['contract_time']??'');$contract=(string)($j['contract_type']??'');$salaryMin=$j['salary_min']??null;$salaryMax=$j['salary_max']??null;$lat=$j['latitude']??null;$lng=$j['longitude']??null;
 $slug=preg_replace('/[^a-z0-9]+/','-',strtolower($title.' '.$company));$slug=trim((string)$slug,'-');$canonical='https://jobsother.com/job/'.rawurlencode($id).'/'.rawurlencode(substr($slug,0,90)).'/';
 $metaDesc=mb_substr($title.($company?' at '.$company:'').($location?' in '.$location:'').'. '.$desc,0,155);
