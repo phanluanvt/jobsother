@@ -219,7 +219,7 @@ async function load(){
         '</div></div>'+
         '<div class="meta">'+newBadge+meta.join('')+(age!==null?'<span class="badge">Posted '+(age===0?'today':age+'d ago')+'</span>':'')+'</div>'+
         '<div class="desc">'+esc(desc)+(desc.length>=320?'…':'')+'</div>'+
-        '<a class="apply" href="/job/'+encodeURIComponent(job.id||'')+'/'+String((job.title||'')+' '+(job.company||'')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'/">View Job →</a>'+
+        '<a class="apply" href="/job/'+encodeURIComponent(job.id||'')+'/'+String((job.title||'')+' '+(job.company||'')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'/?q='+encodeURIComponent(q)+'&location='+encodeURIComponent(loc)+'&country='+encodeURIComponent(country||'ca')+'">View Job →</a>'+
         '<button class="save-btn" type="button" data-save="'+esc(job.id||'')+'">♡ Save</button>'+
       '</article>';
     }).join('');
