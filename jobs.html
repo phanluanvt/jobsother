@@ -136,6 +136,7 @@ footer{background:#fff;border-top:1px solid var(--line);padding:24px 0;color:#8a
 const params=new URLSearchParams(location.search);
 const q=params.get('q')||'';
 const loc=params.get('location')||'';
+const country=(params.get('country')||'ca').toLowerCase();
 const page=Math.max(1,parseInt(params.get('page')||'1',10));
 const qv=document.getElementById('q');
 const lv=document.getElementById('loc');
@@ -147,6 +148,7 @@ document.getElementById('search').addEventListener('submit',e=>{
   const p=new URLSearchParams();
   if(qv.value.trim())p.set('q',qv.value.trim());
   if(lv.value.trim())p.set('location',lv.value.trim());
+  p.set('country',country);
   location.href='/jobs.html?'+p;
 });
 
@@ -168,6 +170,7 @@ function pageUrl(n){
   const p=new URLSearchParams();
   if(q)p.set('q',q);
   if(loc)p.set('location',loc);
+  p.set('country',country);
   p.set('page',String(n));
   return '/jobs.html?'+p.toString();
 }
@@ -176,6 +179,7 @@ async function load(){
   const api=new URLSearchParams({page:String(page),results_per_page:'20'});
   if(q)api.set('q',q);
   if(loc)api.set('location',loc);
+  api.set('country',country);
 
   try{
     const r=await fetch('/api/jobs.php?'+api.toString());
