@@ -136,7 +136,7 @@ footer{background:#fff;border-top:1px solid var(--line);padding:24px 0;color:#8a
 const params=new URLSearchParams(location.search);
 const q=params.get('q')||'';
 const loc=params.get('location')||'';
-const country=(params.get('country')||'ca').toLowerCase();
+const country=(params.get('country')||'').toLowerCase();
 const page=Math.max(1,parseInt(params.get('page')||'1',10));
 const qv=document.getElementById('q');
 const lv=document.getElementById('loc');
@@ -148,7 +148,7 @@ document.getElementById('search').addEventListener('submit',e=>{
   const p=new URLSearchParams();
   if(qv.value.trim())p.set('q',qv.value.trim());
   if(lv.value.trim())p.set('location',lv.value.trim());
-  p.set('country',country);
+  if(country)p.set('country',country);
   location.href='/jobs.html?'+p;
 });
 
@@ -179,12 +179,17 @@ async function load(){
   const api=new URLSearchParams({page:String(page),results_per_page:'20'});
   if(q)api.set('q',q);
   if(loc)api.set('location',loc);
-  api.set('country',country);
+  if(country)api.set('country',country);
 
   try{
     const r=await fetch('/api/jobs.php?'+api.toString());
     const data=await r.json();
     if(!r.ok) throw new Error(data.error||'Unable to load jobs');
+    if(data.unsupported_country){
+      document.getElementById('count').textContent='';
+      document.getElementById('results').innerHTML='<div class="notice"><strong>JobsOther detected your location correctly.</strong><br><br>Our current job provider does not yet support job listings in this country. You can still enter a location in a supported market such as Canada, United States, United Kingdom, Australia or New Zealand.</div>';
+      return;
+    }
 
     document.getElementById('count').textContent=
       new Intl.NumberFormat('en-CA').format(data.count||0)+' jobs found';
