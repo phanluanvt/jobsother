@@ -8,6 +8,6 @@ $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_
 $d=json_decode((string)$body,true);$a=$d['address']??[];
 $area=$a['neighbourhood']??$a['suburb']??$a['quarter']??$a['city_district']??'';
 $city=$a['city']??$a['town']??$a['municipality']??$a['village']??'';
-$province=$a['state']??'';$postcode=$a['postcode']??'';
+$province=$a['state']??'';$postcode=$a['postcode']??'';$cc=strtolower((string)($a['country_code']??''));
 $label=trim(($area!==''?$area.', ':'').($city!==''?$city.', ':'').$province,', ');
-echo json_encode(['location'=>$label,'area'=>$area,'city'=>$city,'province'=>$province,'postcode'=>$postcode,'lat'=>$lat,'lng'=>$lng],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+echo json_encode(['location'=>$label,'area'=>$area,'city'=>$city,'province'=>$province,'postcode'=>$postcode,'country'=>$cc,'lat'=>$lat,'lng'=>$lng],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
