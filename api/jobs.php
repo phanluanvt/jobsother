@@ -105,7 +105,7 @@ foreach (($data['results'] ?? []) as $job) {
     $hash = hash('sha256', $dedupeKey);
     if (isset($seen[$hash])) continue;
     $seen[$hash] = true;
-    $results[] = [
+    $normalized = [
         'id' => $job['id'] ?? null,
         'title' => $job['title'] ?? 'Untitled job',
         'company' => $job['company']['display_name'] ?? '',
@@ -124,7 +124,13 @@ foreach (($data['results'] ?? []) as $job) {
         'salary_currency' => strtoupper($country) === 'US' ? 'USD' : (strtoupper($country) === 'GB' ? 'GBP' : (strtoupper($country) === 'AU' ? 'AUD' : (strtoupper($country) === 'NZ' ? 'NZD' : 'CAD'))),
         'salary_period' => null,
         'is_new' => !empty($job['created']) && strtotime((string)$job['created']) >= time() - 172800,
+        'country' => $country,
     ];
+    $results[] = $normalized;
+    if (!empty($normalized['id'])) {
+        $cacheFile = sys_get_temp_dir() . '/jobsother-job-' . preg_replace('/[^0-9A-Za-z_-]/', '', (string)$normalized['id']) . '.json';
+        @file_put_contents($cacheFile, json_encode($normalized, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+    }
 }
 
 echo json_encode([
