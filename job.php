@@ -3,23 +3,33 @@ declare(strict_types=1);
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function fail404(): never { http_response_code(404); echo '<!doctype html><title>Job not found | JobsOther</title><h1>Job not found</h1><p><a href="/jobs.html">Search current jobs</a></p>'; exit; }
 $id=trim((string)($_GET['id']??'')); if($id==='') fail404();
+$q=trim((string)($_GET['q']??''));
+$where=trim((string)($_GET['location']??''));
+$country=strtolower(trim((string)($_GET['country']??'ca')));
+$allowedCountries=['ca','us','gb','au','nz'];
+if(!in_array($country,$allowedCountries,true))$country='ca';
 $appId=getenv('ADZUNA_APP_ID')?:''; $appKey=getenv('ADZUNA_APP_KEY')?:'';
 $configPath=dirname(__DIR__).'/jobsother-config.php';
 if((!$appId||!$appKey)&&is_file($configPath)){ $c=require $configPath; if(is_array($c)){ $appId=$appId?:((string)($c['ADZUNA_APP_ID']??'')); $appKey=$appKey?:((string)($c['ADZUNA_APP_KEY']??'')); }}
 if(!$appId||!$appKey){ http_response_code(503); exit('Job service temporarily unavailable.'); }
-$url='https://api.adzuna.com/v1/api/jobs/ca/details/'.rawurlencode($id).'?'.http_build_query(['app_id'=>$appId,'app_key'=>$appKey]);
+$params=['app_id'=>$appId,'app_key'=>$appKey,'results_per_page'=>50,'content-type'=>'application/json'];
+if($q!=='')$params['what']=$q;
+if($where!=='')$params['where']=$where;
+$url='https://api.adzuna.com/v1/api/jobs/'.rawurlencode($country).'/search/1?'.http_build_query($params);
 $body=false;$status=0;
 if(function_exists('curl_init')){$ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_CONNECTTIMEOUT=>8,CURLOPT_TIMEOUT=>18,CURLOPT_HTTPHEADER=>['Accept: application/json'],CURLOPT_USERAGENT=>'JobsOther/1.0']);$body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);}
-else{$ctx=stream_context_create(['http'=>['timeout'=>18,'header'=>"Accept: application/json\r\nUser-Agent: JobsOther/1.0\r\n",'ignore_errors'=>true]]);$body=@file_get_contents($url,false,$ctx);if(isset($http_response_header[0])&&preg_match('/\s(\d{3})\s/',$http_response_header[0],$m))$status=(int)$m[1];}
+else{$ctx=stream_context_create(['http'=>['timeout'=>18,'header'=>"Accept: application/json\r\nUser-Agent: JobsOther/1.0\r\n",'ignore_errors'=>true]]);$body=@file_get_contents($url,false,$ctx);if(isset($http_response_header[0])&&preg_match('/\\s(\\d{3})\\s/',$http_response_header[0],$m))$status=(int)$m[1];}
 if($body===false||$status<200||$status>=300) fail404();
-$j=json_decode((string)$body,true); if(!is_array($j)||empty($j['title'])) fail404();
+$data=json_decode((string)$body,true);$j=null;
+foreach(($data['results']??[]) as $candidate){if((string)($candidate['id']??'')===$id){$j=$candidate;break;}}
+if(!is_array($j)||empty($j['title'])) fail404();
 $title=trim((string)$j['title']);$company=trim((string)($j['company']['display_name']??''));$location=trim((string)($j['location']['display_name']??''));$desc=trim(strip_tags((string)($j['description']??'')));$created=(string)($j['created']??'');$apply=(string)($j['redirect_url']??'');$type=(string)($j['contract_time']??'');$contract=(string)($j['contract_type']??'');$salaryMin=$j['salary_min']??null;$salaryMax=$j['salary_max']??null;$lat=$j['latitude']??null;$lng=$j['longitude']??null;
 $slug=preg_replace('/[^a-z0-9]+/','-',strtolower($title.' '.$company));$slug=trim((string)$slug,'-');$canonical='https://jobsother.com/job/'.rawurlencode($id).'/'.rawurlencode(substr($slug,0,90)).'/';
 $metaDesc=mb_substr($title.($company?' at '.$company:'').($location?' in '.$location:'').'. '.$desc,0,155);
 $schema=['@context'=>'https://schema.org','@type'=>'JobPosting','title'=>$title,'description'=>$desc,'identifier'=>['@type'=>'PropertyValue','name'=>$company?:'JobsOther source','value'=>$id],'datePosted'=>$created,'hiringOrganization'=>['@type'=>'Organization','name'=>$company?:'Employer'],'directApply'=>false];
 if($type||$contract){$map=['full_time'=>'FULL_TIME','part_time'=>'PART_TIME','permanent'=>'FULL_TIME','contract'=>'CONTRACTOR'];$raw=$type?:$contract;$schema['employmentType']=$map[$raw]??strtoupper($raw);}
-$address=['@type'=>'PostalAddress','addressCountry'=>'CA']; if($location)$address['addressLocality']=$location;$schema['jobLocation']=['@type'=>'Place','address'=>$address];if($lat!==null&&$lng!==null)$schema['jobLocation']['geo']=['@type'=>'GeoCoordinates','latitude'=>$lat,'longitude'=>$lng];
-if($salaryMin!==null||$salaryMax!==null){$v=['@type'=>'QuantitativeValue','unitText'=>'YEAR'];if($salaryMin!==null)$v['minValue']=$salaryMin;if($salaryMax!==null)$v['maxValue']=$salaryMax;$schema['baseSalary']=['@type'=>'MonetaryAmount','currency'=>'CAD','value'=>$v];}
+$address=['@type'=>'PostalAddress','addressCountry'=>strtoupper($country)]; if($location)$address['addressLocality']=$location;$schema['jobLocation']=['@type'=>'Place','address'=>$address];if($lat!==null&&$lng!==null)$schema['jobLocation']['geo']=['@type'=>'GeoCoordinates','latitude'=>$lat,'longitude'=>$lng];
+if($salaryMin!==null||$salaryMax!==null){$v=['@type'=>'QuantitativeValue','unitText'=>'YEAR'];if($salaryMin!==null)$v['minValue']=$salaryMin;if($salaryMax!==null)$v['maxValue']=$salaryMax;$schema['baseSalary']=['@type'=>'MonetaryAmount','currency'=>($country==='us'?'USD':($country==='gb'?'GBP':($country==='au'?'AUD':($country==='nz'?'NZD':'CAD')))),'value'=>$v];}
 ?><!doctype html><html lang="en"><head>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-C3TNC6YFYV"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-C3TNC6YFYV');</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e($title.($company?' at '.$company:'').' | JobsOther')?></title><meta name="description" content="<?=e($metaDesc)?>"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="<?=e($canonical)?>"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script type="application/ld+json"><?=json_encode($schema,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP)?></script>
