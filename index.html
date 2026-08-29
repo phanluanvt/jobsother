@@ -198,6 +198,11 @@
     }
     .footer-links{display:flex;flex-wrap:wrap;gap:16px}
     .footer-links a:hover{color:var(--orange)}
+    .translate-box{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .translate-label{font-size:12px;color:#98a2b3}
+    #google_translate_element select{border:1px solid #d8dce3;border-radius:7px;padding:7px 9px;background:#fff;color:#333;font-size:13px}
+    .goog-te-gadget{font-family:inherit!important;font-size:0!important}
+    .goog-te-gadget span{display:none!important}
 
     @media(max-width:760px){
       .nav-links a:not(.post-btn){display:none}
@@ -309,12 +314,18 @@
 <footer>
   <div class="wrap footer-row">
     <div>© 2026 JobsOther. All rights reserved.</div>
-    <div class="footer-links">
-      <a href="/about.html">About</a>
-      <a href="/terms.html">Terms</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/cookie.html">Cookies</a>
-      <a href="/contact.html">Contact</a>
+    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+      <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/cookie.html">Cookies</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+      <div class="translate-box">
+        <span class="translate-label">Language</span>
+        <div id="google_translate_element"></div>
+      </div>
     </div>
   </div>
 </footer>
@@ -445,5 +456,18 @@
   });
 })();
 </script>
+<script>
+  function googleTranslateElementInit(){
+    if(window.google && google.translate){
+      new google.translate.TranslateElement({
+        pageLanguage:'en',
+        includedLanguages:'en,fr,vi,zh-CN,zh-TW,es,pa,hi,ko,ja,ar,pt,de,it,ru,tl',
+        layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay:false
+      },'google_translate_element');
+    }
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
