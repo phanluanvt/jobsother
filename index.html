@@ -360,12 +360,21 @@
 </footer>
 
 <script>
+  let detectedCountry='ca';
+  fetch('/api/geoip.php').then(r=>r.json()).then(d=>{
+    detectedCountry=d.country||'ca';
+    const field=document.getElementById('location');
+    if(field && !field.value && d.location) field.value=d.location;
+    document.documentElement.dataset.country=detectedCountry;
+  }).catch(()=>{});
+
   function runSearch(){
     const q=document.getElementById('keyword').value.trim();
     const location=document.getElementById('location').value.trim();
     const params=new URLSearchParams();
     if(q) params.set('q',q);
     if(location) params.set('location',location);
+    params.set('country',detectedCountry);
     const lat=document.getElementById('location').dataset.lat,lng=document.getElementById('location').dataset.lng;
     if(lat&&lng){params.set('lat',lat);params.set('lng',lng);params.set('radius','10');}
     window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
@@ -388,7 +397,7 @@
         const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
         const d=await r.json();
         const location=d.location||d.city||'';
-        const p=new URLSearchParams({location,lat:String(pos.coords.latitude),lng:String(pos.coords.longitude),radius:'10'});
+        const p=new URLSearchParams({location,country:d.country||detectedCountry,lat:String(pos.coords.latitude),lng:String(pos.coords.longitude),radius:'10'});
         window.location.href='/jobs.html?'+p.toString();
       }catch(e){
         document.getElementById('location').scrollIntoView({behavior:'smooth',block:'center'});
@@ -415,6 +424,7 @@
         field.value=d.location||d.city||'';
         field.dataset.lat=String(pos.coords.latitude);
         field.dataset.lng=String(pos.coords.longitude);
+        if(d.country) detectedCountry=d.country;
       }catch(e){}
       this.textContent='⌖ Use my location';
     },()=>{this.textContent='⌖ Use my location';alert('Location permission was not granted.');});
