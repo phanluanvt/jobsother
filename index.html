@@ -366,6 +366,8 @@
     const params=new URLSearchParams();
     if(q) params.set('q',q);
     if(location) params.set('location',location);
+    const lat=document.getElementById('location').dataset.lat,lng=document.getElementById('location').dataset.lng;
+    if(lat&&lng){params.set('lat',lat);params.set('lng',lng);params.set('radius','10');}
     window.location.href='/jobs.html'+(params.toString()?'?'+params.toString():'');
   }
 
@@ -385,8 +387,9 @@
       try{
         const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
         const d=await r.json();
-        const location=d.location||'';
-        window.location.href='/jobs.html?location='+encodeURIComponent(location)+'&radius=25';
+        const location=d.location||d.city||'';
+        const p=new URLSearchParams({location,lat:String(pos.coords.latitude),lng:String(pos.coords.longitude),radius:'10'});
+        window.location.href='/jobs.html?'+p.toString();
       }catch(e){
         document.getElementById('location').scrollIntoView({behavior:'smooth',block:'center'});
         document.getElementById('location').focus();
@@ -408,7 +411,10 @@
       try{
         const r=await fetch('/api/location.php?lat='+encodeURIComponent(pos.coords.latitude)+'&lng='+encodeURIComponent(pos.coords.longitude));
         const d=await r.json();
-        document.getElementById('location').value=d.location||'';
+        const field=document.getElementById('location');
+        field.value=d.location||d.city||'';
+        field.dataset.lat=String(pos.coords.latitude);
+        field.dataset.lng=String(pos.coords.longitude);
       }catch(e){}
       this.textContent='⌖ Use my location';
     },()=>{this.textContent='⌖ Use my location';alert('Location permission was not granted.');});
